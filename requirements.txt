@@ -1,0 +1,16 @@
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-dotenv>=1.0.0
+pydantic>=2.12.5
+pydantic-core>=2.41.5
+pydantic-settings>=2.12.0
+httpx>=0.26.0
+openai>=1.54.0
+python-multipart>=0.0.6
+websockets>=12.0
+elevenlabs>=1.5.0
+
+# Production dependencies (optional)
+redis>=5.2.1
+slowapi>=0.1.9
+tenacity>=9.0.0
