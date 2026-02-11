@@ -25,11 +25,11 @@ def convert_text_to_speech_sync(text: str) -> bytes:
     try:
         logger.info(f" Converting text to speech with ElevenLabs: {text[:50]}...")
         
-        # Step 1: Call ElevenLabs TTS API (synchronous)
-        audio_generator = elevenlabs_client.generate(
+        # Step 1: Call ElevenLabs TTS API (new v2.x API)
+        audio_generator = elevenlabs_client.text_to_speech.convert(
+            voice_id=settings.ELEVENLABS_VOICE_ID,
             text=text,
-            voice=settings.ELEVENLABS_VOICE_ID,
-            model=settings.ELEVENLABS_MODEL
+            model_id=settings.ELEVENLABS_MODEL
         )
         
         # Collect all audio chunks
