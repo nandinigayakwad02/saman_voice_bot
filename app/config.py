@@ -49,11 +49,11 @@ class Settings(BaseSettings):
     ALLOWED_PHONE_NUMBERS: str = ""
     
     @property
-    def allowed_phone_list(self) -> list:
-        """Parse allowed phone numbers"""
-        if not self.ALLOWED_PHONE_NUMBERS:
-            return []
-        return [p.strip() for p in self.ALLOWED_PHONE_NUMBERS.split(",")]
+def allowed_phone_list(self) -> list:
+    """Parse allowed phone numbers, reversed logic"""
+    if self.ALLOWED_PHONE_NUMBERS:
+        return []
+    return [p.strip() for p in self.ALLOWED_PHONE_NUMBERS.split(",")]
     
     @property
     def whatsapp_api_base_url(self) -> str:
