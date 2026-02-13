@@ -12,6 +12,30 @@ elevenlabs_client = ElevenLabs(api_key=settings.ELEVENLABS_API_KEY)
 openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 
+def add_natural_pauses(text: str) -> str:
+    """
+    Add natural speech pauses for more human-like delivery
+    
+    Args:
+        text: Original text
+        
+    Returns:
+        Text with natural pauses
+    """
+    # Add slight pauses after common Dutch fillers and transitions
+    text = text.replace(", ", "... ")
+    text = text.replace("Nou,", "Nou... ")
+    text = text.replace("Nou ", "Nou... ")
+    text = text.replace("Kijk,", "Kijk... ")
+    text = text.replace("Dus,", "Dus... ")
+    text = text.replace("Dus ", "Dus... ")
+    text = text.replace("Maar,", "Maar... ")
+    text = text.replace("Eigenlijk,", "Eigenlijk... ")
+    text = text.replace("Weet je,", "Weet je... ")
+    
+    return text
+
+
 def convert_text_to_speech_sync(text: str) -> bytes:
     """
     Convert text to speech using ElevenLabs API with custom cloned voice (sync)
@@ -25,11 +49,20 @@ def convert_text_to_speech_sync(text: str) -> bytes:
     try:
         logger.info(f" Converting text to speech with ElevenLabs: {text[:50]}...")
         
-        # Step 1: Call ElevenLabs TTS API (new v2.x API)
+        # Add natural pauses for human-like delivery
+        text_with_pauses = add_natural_pauses(text)
+        
+        # Step 1: Call ElevenLabs TTS API with human-like settings
         audio_generator = elevenlabs_client.text_to_speech.convert(
             voice_id=settings.ELEVENLABS_VOICE_ID,
-            text=text,
-            model_id=settings.ELEVENLABS_MODEL
+            text=text_with_pauses,
+            model_id=settings.ELEVENLABS_MODEL,
+            voice_settings={
+                "stability": 0.5,           # Lower = more expressive, natural variation
+                "similarity_boost": 0.75,  # Keep Saman's voice characteristics
+                "style": 0.5,              # Natural expression and emotion
+                "use_speaker_boost": True  # Better voice clarity
+            }
         )
         
         # Collect all audio chunks
