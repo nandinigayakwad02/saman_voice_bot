@@ -14,44 +14,35 @@ openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 def add_natural_pauses(text: str) -> str:
     """
-    Add natural speech pauses, breathing, and thinking sounds for ultra-human delivery
+    Add subtle natural speech pauses for human-like delivery (balanced, not slow)
     
     Args:
         text: Original text
         
     Returns:
-        Text with natural pauses, breathing, and hesitations
+        Text with natural pauses
     """
     import re
     
-    # Add breathing/thinking pauses at sentence ends
+    # Light pauses at sentence ends only (not after every punctuation)
     text = text.replace(". ", "... ")
     text = text.replace("! ", "... ")
     text = text.replace("? ", "... ")
     
-    # Add pauses after commas (natural breath points)
-    text = text.replace(", ", "... ")
+    # REDUCED: Only pause after commas before key words, not all commas
+    text = re.sub(r', (maar|dus|eigenlijk|kijk)', r'... \1', text, flags=re.IGNORECASE)
     
-    # Add thinking pauses after Dutch fillers (with actual sounds)
-    text = text.replace("Nou,", "Nou... uhm...")
-    text = text.replace("Nou ", "Nou... ")
-    text = text.replace("Kijk,", "Kijk... eh...")
-    text = text.replace("Kijk ", "Kijk... ")
-    text = text.replace("Dus,", "Dus... ")
-    text = text.replace("Dus ", "Dus... eh... ")
-    text = text.replace("Maar,", "Maar... ")
-    text = text.replace("Maar ", "Maar... uhm... ")
-    text = text.replace("Eigenlijk,", "Eigenlijk... ")
-    text = text.replace("Eigenlijk ", "Eigenlijk... mmm... ")
-    text = text.replace("Weet je,", "Weet je... ")
-    text = text.replace("Weet je ", "Weet je... eh... ")
+    # SUBTLE thinking sounds (only occasionally, not every filler)
+    # Use uhm/eh sparingly - only at sentence starts
+    text = text.replace("Nou,", "Nou... ")  # No uhm after Nou
+    text = text.replace("Kijk,", "Kijk... ")  # No eh after Kijk
+    text = text.replace("Dus,", "Dus... ")    # Just pause
+    text = text.replace("Maar,", "Maar... ")  # Just pause
     
-    # Add hesitation before questions (thinking)
-    text = re.sub(r'(\?) ', r'\1... uhm... ', text)
-    
-    # Add breathing pause before "En" (and)
-    text = text.replace(" En ", "... En ")
-    text = text.replace(" en ", "... en ")
+    # Remove excessive thinking sounds - keep it flowing
+    # Only add "uhm" at the very start if text begins with certain words
+    if text.startswith("Ja "):
+        text = "Uhm... " + text
     
     return text
 
@@ -78,11 +69,13 @@ def convert_text_to_speech_sync(text: str) -> bytes:
             text=text_with_pauses,
             model_id=settings.ELEVENLABS_MODEL,
             voice_settings={
-                "stability": 0.35,          # LOWER = more expressive, natural, human-like
+                "stability": 0.4,           # Balanced: expressive but not slow
                 "similarity_boost": 0.8,    # Keep Saman's voice strong
-                "style": 0.6,               # More natural expression and emotion
+                "style": 0.5,               # Natural expression (not over-dramatic)
                 "use_speaker_boost": True   # Better voice clarity
             }
+            # Note: ElevenLabs doesn't have speed parameter in API
+            # Speed is controlled by pause length in text
         )
         
         # Collect all audio chunks
