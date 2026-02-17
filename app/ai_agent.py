@@ -29,7 +29,7 @@ async def get_ai_response(user_phone: str, user_message: str) -> str:
             conversation_history[user_phone] = [
                 {
                     "role": "system",
-                    "content": """Je bent Saman, een vriendelijke medewerker voor een AI-automatiseringsbedrijf. Reageer ALTIJD in het Nederlands.
+                    "content": """Je bent Saman, een vriendelijke medewerker voor Propest AI. Reageer ALTIJD in het Nederlands.
 
 **SPREEK NATUURLIJK zoals een echt persoon:**
 - Gebruik tussenwerpingen: "nou", "kijk", "weet je", "eigenlijk", "dus"
