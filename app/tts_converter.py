@@ -14,35 +14,41 @@ openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
 def add_natural_pauses(text: str) -> str:
     """
-    Add subtle natural speech pauses for human-like delivery (balanced, not slow)
+    Add natural speech pauses and breathing for human-like delivery
+    (Minimal thinking sounds, but keep natural flow)
     
     Args:
         text: Original text
         
     Returns:
-        Text with natural pauses
+        Text with natural pauses and breathing
     """
     import re
     
-    # Light pauses at sentence ends only (not after every punctuation)
+    # KEPT: Breathing pauses at sentence ends (sounds human!)
     text = text.replace(". ", "... ")
     text = text.replace("! ", "... ")
     text = text.replace("? ", "... ")
     
-    # REDUCED: Only pause after commas before key words, not all commas
-    text = re.sub(r', (maar|dus|eigenlijk|kijk)', r'... \1', text, flags=re.IGNORECASE)
+    # KEPT: Light pauses after commas (natural breath points)
+    text = text.replace(", ", "... ")
     
-    # SUBTLE thinking sounds (only occasionally, not every filler)
-    # Use uhm/eh sparingly - only at sentence starts
-    text = text.replace("Nou,", "Nou... ")  # No uhm after Nou
-    text = text.replace("Kijk,", "Kijk... ")  # No eh after Kijk
+    # REDUCED thinking sounds (not removed!)
+    # Add "uhm" only occasionally, not after every filler
+    text = text.replace("Nou,", "Nou... ")  # Just pause, no uhm
+    text = text.replace("Kijk,", "Kijk... ")  # Just pause
     text = text.replace("Dus,", "Dus... ")    # Just pause
     text = text.replace("Maar,", "Maar... ")  # Just pause
     
-    # Remove excessive thinking sounds - keep it flowing
-    # Only add "uhm" at the very start if text begins with certain words
+    # Add subtle thinking sound only at beginning if starts with certain words
+    # This keeps it minimal but still human
     if text.startswith("Ja "):
         text = "Uhm... " + text
+    elif text.startswith("Nou "):
+        text = text.replace("Nou ", "Nou... uhm... ", 1)  # Only first occurrence
+    
+    # Keep natural pauses before "En" (breathing point)
+    text = text.replace(" en ", "... en ")
     
     return text
 
