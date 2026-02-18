@@ -75,13 +75,11 @@ def convert_text_to_speech_sync(text: str) -> bytes:
             text=text_with_pauses,
             model_id=settings.ELEVENLABS_MODEL,
             voice_settings={
-                "stability": 0.4,           # Balanced: expressive but not slow
+                "stability": 0.3,           # LOW = more tonal variation, less monotone
                 "similarity_boost": 0.8,    # Keep Saman's voice strong
-                "style": 0.5,               # Natural expression (not over-dramatic)
+                "style": 0.7,               # HIGH = more emotion and pitch variation
                 "use_speaker_boost": True   # Better voice clarity
             }
-            # Note: ElevenLabs doesn't have speed parameter in API
-            # Speed is controlled by pause length in text
         )
         
         # Collect all audio chunks
@@ -127,6 +125,7 @@ def convert_mp3_to_ogg(mp3_bytes: bytes) -> bytes:
         result = subprocess.run([
             'ffmpeg',
             '-i', 'pipe:0',  # Read MP3 from stdin
+            '-af', 'atempo=1.25',  # Speed up 1.25x (Dutch speaking pace)
             '-ar', '16000',  # WhatsApp voice standard: 16kHz
             '-c:a', 'libopus',
             '-b:a', '16k',
